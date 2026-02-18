@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EggsWeb — Conecta con el mundo</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ══════════ LOADING OVERLAY ══════════ -->
+<div id="loading-overlay" class="on">
+  <div class="spinner"></div>
+  <p>Conectando...</p>
+</div>
+
+<!-- ══════════ HEADER ══════════ -->
+<div id="hdr">
+  <div id="hdr-top">
+    <div id="logo" onclick="logoClick()">Eggs<span>Web</span></div>
+    <div id="hdr-links"><a href="#">Ayuda</a><a href="#">Privacidad</a><a href="#">Términos</a></div>
+    <div id="hdr-user">
+      <span class="dot"></span><b id="hdr-uname"></b> |
+      <a href="#" onclick="openMod('mod-config')">configuración</a> |
+      <a href="#" onclick="doLogout()">salir</a>
+    </div>
+  </div>
+  <div id="nav-login" class="nav">
+    <div class="ntab on">Inicio</div>
+    <div class="ntab" onclick="showToast('Inicia sesión para continuar')">Mi Perfil</div>
+    <div class="ntab" onclick="showToast('Inicia sesión para continuar')">Amigos</div>
+    <div class="ntab" onclick="showToast('Inicia sesión para continuar')">Mensajes</div>
+  </div>
+  <div id="nav-app" class="nav" style="display:none;">
+    <div class="ntab on" id="ntab-inicio" onclick="navClick(this)">Inicio</div>
+    <div class="ntab" onclick="openMod('mod-perfil');navClick(this)">Mi Perfil</div>
+    <div class="ntab" onclick="openMod('mod-amigos');navClick(this)">Amigos <span class="bdg" id="req-bdg">0</span></div>
+    <div class="ntab" onclick="openMod('mod-msg');navClick(this)">Mensajes</div>
+    <div class="ntab" onclick="openMod('mod-scrap');navClick(this)">Scrapbook</div>
+    <div class="ntab" onclick="openMod('mod-config');navClick(this)">Configuración</div>
+  </div>
+</div>
+
+<!-- ══════════ PAGE: LOGIN ══════════ -->
+<div id="pg-login" class="page on">
+  <div class="wrap">
+
+    <!-- PROMO -->
+    <div id="promo-col">
+      <div class="pnl">
+        <div class="pnl-t">📡 Bienvenido a EggsWeb</div>
+        <div class="pnl-b">
+          <div class="promo-logo">Eggs<span>Web</span></div>
+          <div style="font-size:13px;font-weight:bold;color:var(--blue);margin-bottom:6px;">Conecta con el mundo real.</div>
+          <p style="font-size:11px;color:#445;line-height:1.65;margin-bottom:10px;">EggsWeb es la red social donde reencuentras amigos, compartes momentos y conoces personas de todo el mundo — gratis, siempre.</p>
+          <div style="margin-bottom:8px;">
+            <div class="fi"><span>👥</span> Conecta con amigos reales</div>
+            <div class="fi"><span>📸</span> Comparte fotos, videos y audio</div>
+            <div class="fi"><span>✉️</span> Mensajes privados</div>
+            <div class="fi"><span>📋</span> Scrapbook personal</div>
+            <div class="fi"><span>💬</span> Comenta y da likes a publicaciones</div>
+            <div class="fi"><span>🔗</span> Comparte posts en redes sociales</div>
+          </div>
+          <div class="prow">
+            <div class="pbox"><div class="pnum" id="promo-users">0</div><div class="plbl">Usuarios</div></div>
+            <div class="pbox"><div class="pnum" id="promo-posts">0</div><div class="plbl">Posts</div></div>
+            <div class="pbox"><div class="pnum">100%</div><div class="plbl">Gratis</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AUTH PANEL -->
+    <div>
+      <div class="pnl">
+        <div class="atb">
+          <button class="tbtn on" id="atab-login" onclick="switchAuth('login')">Iniciar Sesión</button>
+          <button class="tbtn" id="atab-reg" onclick="switchAuth('reg')">Crear Cuenta</button>
+        </div>
+        <div class="pnl-b">
+
+          <!-- LOGIN FORM -->
+          <div class="tc on" id="ap-login">
+            <div style="font-size:13px;font-weight:bold;color:var(--blue);margin-bottom:8px;">Accede a tu cuenta</div>
+            <div class="al er" id="login-al"></div>
+            <div class="f"><label>Correo electrónico:</label><input type="email" id="l-email" placeholder="tu@correo.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
+            <div class="f">
+              <label>Contraseña: <span class="fl" onclick="switchAuth('forgot')">¿La olvidaste?</span></label>
+              <input type="password" id="l-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+            </div>
+            <div class="fchk"><input type="checkbox" id="l-rem" checked><label for="l-rem">Mantener sesión iniciada</label></div>
+            <button class="b-full" id="login-btn" onclick="doLogin()">Entrar a EggsWeb →</button>
+            <div class="dvd">o</div>
+            <div style="text-align:center;font-size:11px;color:#667;">
+              ¿No tienes cuenta? <span style="color:var(--link);cursor:pointer;font-weight:bold;" onclick="switchAuth('reg')">Créala gratis aquí</span>
+            </div>
+          </div>
+
+          <!-- FORGOT -->
+          <div class="tc" id="ap-forgot">
+            <div style="font-size:13px;font-weight:bold;color:var(--blue);margin-bottom:4px;">Recuperar contraseña</div>
+            <p style="font-size:11px;color:#556;margin-bottom:8px;">Ingresa tu correo y recibirás un enlace para restablecer tu contraseña.</p>
+            <div class="al er" id="fg-al"></div>
+            <div class="al ok" id="fg-ok"></div>
+            <div class="f"><label>Correo electrónico:</label><input type="email" id="fg-email" placeholder="tu@correo.com"></div>
+            <button class="b-full" onclick="doForgot()">Enviar enlace de recuperación</button>
+            <div style="text-align:center;margin-top:8px;">
+              <span style="font-size:11px;color:var(--link);cursor:pointer;" onclick="switchAuth('login')">← Volver al inicio de sesión</span>
+            </div>
+          </div>
+
+          <!-- REGISTER -->
+          <div class="tc" id="ap-reg">
+            <div style="font-size:13px;font-weight:bold;color:var(--blue);margin-bottom:8px;">Crea tu cuenta gratis</div>
+            <div class="steps">
+              <div class="stp on" id="si1"><div class="stpc">1</div><div class="stpl">Personal</div></div>
+              <div class="stp" id="si2"><div class="stpc">2</div><div class="stpl">Acceso</div></div>
+              <div class="stp" id="si3"><div class="stpc">3</div><div class="stpl">¡Listo!</div></div>
+            </div>
+            <div class="al er" id="reg-al"></div>
+
+            <!-- Step 1 -->
+            <div class="rstep on" id="rs1">
+              <div class="f2">
+                <div class="f"><label>Nombre:</label><input type="text" id="r-name" placeholder="Tu nombre"></div>
+                <div class="f"><label>Apellido:</label><input type="text" id="r-last" placeholder="Tu apellido"></div>
+              </div>
+              <div class="f"><label>Fecha de nacimiento:</label><input type="date" id="r-dob"></div>
+              <div class="f"><label>Género:</label>
+                <select id="r-gender">
+                  <option value="">Seleccionar...</option>
+                  <option>Masculino</option><option>Femenino</option>
+                  <option>No binario</option><option>Prefiero no decir</option>
+                </select>
+              </div>
+              <div class="f"><label>País:</label>
+                <select id="r-country">
+                  <option value="">Seleccionar...</option>
+                  <option>Argentina</option><option>Bolivia</option><option>Brasil</option>
+                  <option>Chile</option><option>Colombia</option><option>Costa Rica</option>
+                  <option>Cuba</option><option>Ecuador</option><option>El Salvador</option>
+                  <option>España</option><option>Guatemala</option><option>Honduras</option>
+                  <option>México</option><option>Nicaragua</option><option>Panamá</option>
+                  <option>Paraguay</option><option>Perú</option><option>Puerto Rico</option>
+                  <option>República Dominicana</option><option>Uruguay</option>
+                  <option>Venezuela</option><option>Otro</option>
+                </select>
+              </div>
+              <div class="f">
+                <label>Pista de contraseña <span style="color:#999;font-weight:normal;">(opcional, para recuperar acceso)</span>:</label>
+                <input type="text" id="r-hint" placeholder="Ej: mi película favorita">
+              </div>
+              <button class="b-full" onclick="regNext(1)">Continuar →</button>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="rstep" id="rs2">
+              <div class="f"><label>Correo electrónico:</label><input type="email" id="r-email" placeholder="tu@correo.com"></div>
+              <div class="f">
+                <label>Nombre de usuario:</label>
+                <input type="text" id="r-uname" placeholder="ej: juan.garcia" oninput="checkUname(this)">
+                <span id="uchk" style="font-size:10px;margin-top:2px;display:block;"></span>
+              </div>
+              <div class="f">
+                <label>Contraseña:</label>
+                <input type="password" id="r-pass" placeholder="Mínimo 8 caracteres" oninput="checkPw(this)">
+                <div class="pws" id="pw-wrap"><div class="pwsb" id="pw-bar"></div></div>
+                <div class="pwh" id="pw-hint"></div>
+              </div>
+              <div class="f"><label>Confirmar contraseña:</label><input type="password" id="r-pass2" placeholder="Repite tu contraseña"></div>
+              <div class="fchk">
+                <input type="checkbox" id="terms">
+                <label for="terms">Acepto los <a href="#">Términos de Servicio</a> y la <a href="#">Política de Privacidad</a> de EggsWeb</label>
+              </div>
+              <div style="display:flex;gap:6px;">
+                <button class="btn b-gy" onclick="setStep(1)">← Atrás</button>
+                <button class="b-full" onclick="regNext(2)">Crear mi cuenta</button>
+              </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="rstep" id="rs3" style="text-align:center;padding:16px 0;">
+              <div style="font-size:48px;margin-bottom:10px;">🥚</div>
+              <div style="font-size:15px;font-weight:bold;color:var(--blue);margin-bottom:6px;">¡Bienvenido a EggsWeb!</div>
+              <p style="font-size:11px;color:#556;line-height:1.7;margin-bottom:14px;">
+                Tu cuenta fue creada con éxito.<br>
+                Revisa tu correo para confirmar tu cuenta y luego inicia sesión.
+              </p>
+              <button class="b-full" onclick="switchAuth('login')">Ir a Iniciar Sesión →</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /wrap login -->
+</div><!-- /pg-login -->
+
+<!-- ══════════ PAGE: APP ══════════ -->
+<div id="pg-app" class="page">
+  <div class="wrap">
+
+    <!-- LEFT COL -->
+    <div id="left-col">
+      <div class="pnl" id="pp-panel">
+        <div class="pnl-t">Mi Perfil</div>
+        <div class="pnl-b">
+          <div id="pp-wrap" onclick="document.getElementById('pp-file').click()">
+            <img id="pp-img" src="" alt="foto">
+          </div>
+          <input type="file" id="pp-file" accept=".jpg,.jpeg,.png,.webp" style="display:none" onchange="changePic(event)">
+          <div id="pp-name"></div>
+          <div id="pp-mood">✨ "Conectando el mundo"</div>
+          <div class="pst"><span>Publicaciones</span><span id="st-posts">0</span></div>
+          <div class="pst"><span>Miembro desde</span><span id="st-since">—</span></div>
+          <div class="pst"><span>País</span><span id="st-country">—</span></div>
+        </div>
+      </div>
+      <div class="pnl">
+        <div class="pnl-t">Accesos Rápidos</div>
+        <div class="pnl-b np">
+          <a class="slink" onclick="openMod('mod-amigos')">👥 Usuarios</a>
+          <a class="slink" onclick="openMod('mod-msg')">✉️ Mensajes</a>
+          <a class="slink" onclick="openMod('mod-scrap')">📋 Scrapbook</a>
+          <a class="slink" onclick="openMod('mod-config')">⚙️ Configuración</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- CENTER COL -->
+    <div id="center-col">
+      <div class="pnl">
+        <div class="pnl-t">📢 Publicar en el muro</div>
+        <div class="pnl-b">
+          <div id="post-box">
+            <textarea id="post-txt" placeholder="¿Qué estás pensando?"></textarea>
+            <div id="media-prev" style="margin-top:5px;"></div>
+            <div class="p-acts">
+              <button class="btn b-bl" onclick="publishPost()">Publicar</button>
+              <label class="albl">🖼️ Imagen<input type="file" accept=".jpg,.jpeg,.png,.webp" onchange="prevMedia(event,'image')"></label>
+              <label class="albl">🎬 Video<input type="file" accept=".mp4,.3gp,.mpeg,.webm" onchange="prevMedia(event,'video')"></label>
+              <label class="albl">🎵 Audio<input type="file" accept=".mp3,.wav,.ogg,.wma" onchange="prevMedia(event,'audio')"></label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pnl">
+        <div class="pnl-t">🏠 Actividad</div>
+        <div class="pnl-b" id="feed">
+          <div class="empty-feed"><div class="ico">⏳</div><div>Cargando...</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COL -->
+    <div id="right-col">
+      <div class="pnl">
+        <div class="pnl-t">👥 Usuarios Registrados</div>
+        <div class="pnl-b" id="users-grid">
+          <p style="font-size:11px;color:#999;">Cargando...</p>
+        </div>
+      </div>
+      <div class="pnl">
+        <div class="pnl-t">🎂 Cumpleaños</div>
+        <div class="pnl-b" id="bday-panel">
+          <p style="font-size:11px;color:#999;">Sin cumpleaños hoy.</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /wrap app -->
+</div><!-- /pg-app -->
+
+<!-- FOOTER -->
+<div id="ftr">
+  <b>EggsWeb</b> — <a href="#">Privacidad</a><a href="#">Términos</a><a href="#">Ayuda</a><a href="#">Acerca de</a>
+  <br><span style="color:#aabbdd;">© EggsWeb — Conecta con el mundo</span>
+</div>
+
+<div id="toast"></div>
+<div id="iv" onclick="this.classList.remove('on')"><img id="iv-img" src="" alt=""></div>
+
+<!-- ══ MODAL: MI PERFIL ══ -->
+<div class="ov" id="mod-perfil">
+  <div class="mod" style="width:560px;">
+    <div class="mhdr"><span>👤 Mi Perfil</span><span class="mcls" onclick="closeMod('mod-perfil')">✕</span></div>
+    <div class="mbdy">
+      <div style="display:flex;gap:14px;align-items:flex-start;padding-bottom:12px;border-bottom:1px solid #dde;margin-bottom:12px;">
+        <div style="position:relative;flex-shrink:0;">
+          <img id="mp-pic" src="" style="width:90px;height:90px;object-fit:cover;border:3px solid var(--blue2);border-radius:4px;">
+          <label style="position:absolute;bottom:2px;right:2px;background:rgba(0,0,80,.7);color:#fff;font-size:9px;padding:2px 4px;border-radius:2px;cursor:pointer;">
+            📷<input type="file" accept=".jpg,.jpeg,.png,.webp" style="display:none" onchange="changePic(event)">
+          </label>
+        </div>
+        <div style="flex:1;">
+          <div id="mp-name" style="font-size:16px;font-weight:bold;color:var(--blue);margin-bottom:2px;"></div>
+          <div id="mp-username" style="font-size:12px;color:#888;margin-bottom:6px;"></div>
+          <div id="mp-bio" style="font-size:11px;color:#445;font-style:italic;margin-bottom:6px;line-height:1.5;"></div>
+          <div style="display:flex;gap:16px;flex-wrap:wrap;">
+            <div style="text-align:center;"><div id="mp-posts" style="font-size:18px;font-weight:bold;color:var(--blue);">0</div><div style="font-size:9px;color:#888;text-transform:uppercase;">Posts</div></div>
+            <div style="text-align:center;"><div id="mp-comments" style="font-size:18px;font-weight:bold;color:var(--blue);">0</div><div style="font-size:9px;color:#888;text-transform:uppercase;">Comentarios</div></div>
+            <div style="text-align:center;"><div id="mp-likes-received" style="font-size:18px;font-weight:bold;color:var(--orange);">0</div><div style="font-size:9px;color:#888;text-transform:uppercase;">Likes recibidos</div></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;">
+        <div style="background:#f4f8ff;border:1px solid #dde;border-radius:3px;padding:7px;"><div style="font-size:9px;color:#889;text-transform:uppercase;margin-bottom:2px;">📧 Correo</div><div id="mp-email" style="font-size:11px;color:#334;word-break:break-all;"></div></div>
+        <div style="background:#f4f8ff;border:1px solid #dde;border-radius:3px;padding:7px;"><div style="font-size:9px;color:#889;text-transform:uppercase;margin-bottom:2px;">🌎 País</div><div id="mp-country" style="font-size:11px;color:#334;"></div></div>
+        <div style="background:#f4f8ff;border:1px solid #dde;border-radius:3px;padding:7px;"><div style="font-size:9px;color:#889;text-transform:uppercase;margin-bottom:2px;">🏙️ Ciudad</div><div id="mp-city" style="font-size:11px;color:#334;"></div></div>
+        <div style="background:#f4f8ff;border:1px solid #dde;border-radius:3px;padding:7px;"><div style="font-size:9px;color:#889;text-transform:uppercase;margin-bottom:2px;">📅 Miembro desde</div><div id="mp-since" style="font-size:11px;color:#334;"></div></div>
+        <div style="background:#f4f8ff;border:1px solid #dde;border-radius:3px;padding:7px;"><div style="font-size:9px;color:#889;text-transform:uppercase;margin-bottom:2px;">🎂 Cumpleaños</div><div id="mp-dob" style="font-size:11px;color:#334;"></div></div>
+        <div style="background:#f4f8ff;border:1px solid #dde;border-radius:3px;padding:7px;"><div style="font-size:9px;color:#889;text-transform:uppercase;margin-bottom:2px;">🕐 Último post</div><div id="mp-lastpost" style="font-size:11px;color:#334;"></div></div>
+      </div>
+      <div style="border-top:1px solid #dde;padding-top:10px;">
+        <div style="font-size:11px;font-weight:bold;color:var(--blue);margin-bottom:7px;text-transform:uppercase;letter-spacing:.5px;">📝 Mis publicaciones recientes</div>
+        <div id="mp-feed"></div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn b-bl" onclick="closeMod('mod-perfil');openMod('mod-config')">⚙️ Editar perfil</button>
+        <button class="btn b-gy" onclick="closeMod('mod-perfil')">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: SHARE ══ -->
+<div class="ov" id="mod-share">
+  <div class="mod" style="width:400px;">
+    <div class="mhdr"><span>🔗 Compartir publicación</span><span class="mcls" onclick="closeMod('mod-share')">✕</span></div>
+    <div class="mbdy">
+      <p style="font-size:11px;color:#556;margin-bottom:8px;">Copia el enlace o comparte directamente:</p>
+      <div class="share-row">
+        <input type="text" id="share-url" readonly onclick="this.select()">
+        <button class="btn b-bl" onclick="copyShareUrl()">Copiar</button>
+      </div>
+      <div class="share-opts">
+        <div class="share-opt" onclick="shareWA()"><span class="ico">💬</span>WhatsApp</div>
+        <div class="share-opt" onclick="shareTW()"><span class="ico">🐦</span>Twitter/X</div>
+        <div class="share-opt" onclick="shareFB()"><span class="ico">📘</span>Facebook</div>
+        <div class="share-opt" onclick="shareTG()"><span class="ico">✈️</span>Telegram</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: AMIGOS ══ -->
+<div class="ov" id="mod-amigos">
+  <div class="mod">
+    <div class="mhdr"><span>👥 Usuarios y Amigos</span><span class="mcls" onclick="closeMod('mod-amigos')">✕</span></div>
+    <div class="mbdy">
+      <div class="tb">
+        <div class="tbtn on" onclick="mTab('mod-amigos','tma1',this)">Todos los usuarios</div>
+        <div class="tbtn" onclick="mTab('mod-amigos','tma2',this)">Buscar</div>
+      </div>
+      <div class="tc on" id="tma1">
+        <div id="all-users-list"><p style="font-size:11px;color:#999;">Cargando...</p></div>
+      </div>
+      <div class="tc" id="tma2">
+        <div class="f"><label>Buscar usuario:</label>
+          <div style="display:flex;gap:6px;">
+            <input type="text" id="search-inp" placeholder="Nombre, apellido o usuario..." style="flex:1;" onkeydown="if(event.key==='Enter')searchUser()">
+            <button class="btn b-bl" onclick="searchUser()">Buscar</button>
+          </div>
+        </div>
+        <div id="search-res" style="margin-top:8px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: MENSAJES ══ -->
+<div class="ov" id="mod-msg">
+  <div class="mod" style="width:520px;">
+    <div class="mhdr"><span>✉️ Mensajes</span><span class="mcls" onclick="closeMod('mod-msg')">✕</span></div>
+    <div class="mbdy">
+      <div class="tb">
+        <div class="tbtn on" onclick="mTab('mod-msg','tm1',this)">Recibidos</div>
+        <div class="tbtn" onclick="mTab('mod-msg','tm2',this)">Enviados</div>
+        <div class="tbtn" onclick="mTab('mod-msg','tm3',this)">+ Nuevo</div>
+      </div>
+      <div class="tc on" id="tm1"><p style="font-size:11px;color:#999;padding:8px 0;">Bandeja de entrada vacía.</p></div>
+      <div class="tc" id="tm2"><p style="font-size:11px;color:#999;padding:8px 0;">Sin mensajes enviados.</p></div>
+      <div class="tc" id="tm3">
+        <div class="f"><label>Para (@usuario):</label><input type="text" id="msg-to" placeholder="@nombre_de_usuario"></div>
+        <div class="f"><label>Asunto:</label><input type="text" id="msg-sbj" placeholder="Asunto del mensaje..."></div>
+        <div class="f"><label>Mensaje:</label><textarea id="msg-bdy" rows="5" placeholder="Escribe tu mensaje..."></textarea></div>
+        <button class="btn b-bl" onclick="sendMsg()">📤 Enviar Mensaje</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: SCRAPBOOK ══ -->
+<div class="ov" id="mod-scrap">
+  <div class="mod">
+    <div class="mhdr"><span>📋 Scrapbook</span><span class="mcls" onclick="closeMod('mod-scrap')">✕</span></div>
+    <div class="mbdy">
+      <div class="f"><label>Dejar un scrap:</label><textarea id="scrap-txt" rows="3" placeholder="Escribe algo para el muro..."></textarea></div>
+      <button class="btn b-or" onclick="addScrap()">📌 Publicar Scrap</button>
+      <div style="margin-top:12px;" id="scrap-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: CONFIGURACIÓN ══ -->
+<div class="ov" id="mod-config">
+  <div class="mod" style="width:560px;">
+    <div class="mhdr"><span>⚙️ Configuración</span><span class="mcls" onclick="closeMod('mod-config')">✕</span></div>
+    <div class="mbdy">
+      <div class="tb">
+        <div class="tbtn on" onclick="mTab('mod-config','tc1',this)">Perfil</div>
+        <div class="tbtn" onclick="mTab('mod-config','tc2',this)">Cuenta</div>
+        <div class="tbtn" onclick="mTab('mod-config','tc3',this)">Privacidad</div>
+      </div>
+      <div class="tc on" id="tc1">
+        <div class="fsec">Información Personal</div>
+        <div class="f2">
+          <div class="f"><label>Nombre:</label><input type="text" id="cfg-name"></div>
+          <div class="f"><label>Apellido:</label><input type="text" id="cfg-last"></div>
+        </div>
+        <div class="f"><label>Fecha de Nacimiento:</label><input type="date" id="cfg-dob"></div>
+        <div class="f"><label>País:</label>
+          <select id="cfg-country">
+            <option>Argentina</option><option>Bolivia</option><option>Brasil</option>
+            <option>Chile</option><option>Colombia</option><option>Costa Rica</option>
+            <option>Cuba</option><option>Ecuador</option><option>El Salvador</option>
+            <option>España</option><option>Guatemala</option><option>Honduras</option>
+            <option>México</option><option>Nicaragua</option><option>Panamá</option>
+            <option>Paraguay</option><option>Perú</option><option>Puerto Rico</option>
+            <option>República Dominicana</option><option>Uruguay</option>
+            <option>Venezuela</option><option>Otro</option>
+          </select>
+        </div>
+        <div class="f"><label>Ciudad:</label><input type="text" id="cfg-city"></div>
+        <div class="f"><label>Sobre mí:</label><textarea rows="3" id="cfg-bio" placeholder="Cuéntanos algo sobre ti..."></textarea></div>
+        <div class="fsec">Foto de Perfil</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <img id="cfg-pic" src="" style="width:60px;height:60px;border:2px solid var(--blue2);border-radius:3px;object-fit:cover;">
+          <label class="btn b-gy" style="cursor:pointer;">📷 Cambiar foto<input type="file" accept=".jpg,.jpeg,.png,.webp" style="display:none;" onchange="changePicCfg(event)"></label>
+        </div>
+        <div style="margin-top:12px;"><button class="btn b-bl" onclick="saveConfig()">💾 Guardar Cambios</button></div>
+      </div>
+      <div class="tc" id="tc2">
+        <div class="fsec">Datos de Acceso</div>
+        <div class="f"><label>Correo Electrónico:</label><input type="email" id="cfg-email" readonly style="background:#f0f0f0;color:#888;"></div>
+        <div class="f"><label>Nombre de usuario:</label><input type="text" id="cfg-uname"></div>
+        <div class="fsec">Cambiar Contraseña</div>
+        <div class="f"><label>Nueva contraseña:</label><input type="password" id="cfg-newpass" placeholder="Mínimo 8 caracteres"></div>
+        <div class="f"><label>Confirmar nueva contraseña:</label><input type="password" id="cfg-newpass2" placeholder="Repite tu nueva contraseña"></div>
+        <div class="f"><label>Contraseña actual (para confirmar):</label><input type="password" id="cfg-curpass" placeholder="••••••••"></div>
+        <div class="al er" id="cfg-pass-al"></div>
+        <button class="btn b-bl" onclick="changePass()">🔐 Cambiar Contraseña</button>
+        <div class="fsec" style="color:var(--red);margin-top:16px;">Zona de Peligro</div>
+        <button class="btn b-rd" onclick="deleteAccount()">🗑️ Eliminar mi cuenta</button>
+        <div style="margin-top:10px;"><button class="btn b-bl" onclick="saveConfig()">💾 Guardar Cambios</button></div>
+      </div>
+      <div class="tc" id="tc3">
+        <div class="fsec">Visibilidad del Perfil</div>
+        <div class="f"><label>¿Quién puede ver mi perfil?</label><select><option>Todos (público)</option><option>Solo mis amigos</option><option>Solo yo</option></select></div>
+        <div class="f"><label>¿Quién puede comentar en mis posts?</label><select><option>Todos</option><option>Solo mis amigos</option></select></div>
+        <div class="f"><label>¿Quién puede escribir en mi Scrapbook?</label><select><option>Todos</option><option>Solo mis amigos</option><option>Nadie</option></select></div>
+        <div style="margin-top:10px;"><button class="btn b-bl" onclick="saveConfig()">💾 Guardar Cambios</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SCRIPT — ES Module con Supabase ══════════ -->
+<!-- ⚠️  Requiere servidor HTTP (no funciona abriendo como file://)      -->
+<!-- ⚠️  Edita SUPABASE_URL y SUPABASE_ANON_KEY en app.js antes de subir -->
+<script type="module" src="app.js"></script>
+
+</body>
+</html>
